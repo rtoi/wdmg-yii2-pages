@@ -15,7 +15,6 @@ use wdmg\pages\models\PagesSearch;
  */
 class PagesController extends Controller
 {
-
     /**
      * @var string|null Storaged selected language (locale)
      */
@@ -64,7 +63,7 @@ class PagesController extends Controller
                     ],
                 ]
             ];
-        } else if ($this->module->moduleExist('admin/rbac')) { // Ok, then we check access according to the rules
+        } elseif ($this->module->moduleExist('admin/rbac')) { // Ok, then we check access according to the rules
             $behaviors['access'] = [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -257,7 +256,7 @@ class PagesController extends Controller
                 // Get new URL for saved page
                 $newPageUrl = $model->getPageUrl(false);
 
-                if($model->save()) {
+                if ($model->save()) {
                     // Set 301-redirect from old URL to new
                     if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::STATUS_PUBLISHED)) {
                         // @TODO: remove old redirects
@@ -342,7 +341,7 @@ class PagesController extends Controller
     {
 
         $model = $this->findModel($id);
-        if($model->delete()) {
+        if ($model->delete()) {
             // @TODO: remove redirects of deleted pages
 
             // Log activity

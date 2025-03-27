@@ -29,7 +29,7 @@ use wdmg\widgets\LangSwitcher;
                 'class' => 'pull-right'
             ]
         ]);
-    ?>
+        ?>
 
     <?php $form = ActiveForm::begin([
         'id' => "addPageForm",
@@ -48,15 +48,15 @@ use wdmg\widgets\LangSwitcher;
     ])->label(Yii::t('app/modules/pages', 'Page URL')); ?>
 
     <?php
-        if (isset(Yii::$app->redirects) && $model->url && ($model->status == $model::STATUS_PUBLISHED)) {
-            if ($url = Yii::$app->redirects->check($model->url, false)) {
-                echo Html::tag('div', Yii::t('app/modules/redirects', 'For this URL is active redirect to {url}', [
-                    'url' => $url
-                ]), [
-                    'class' => "alert alert-warning"
-                ]);
-            }
+    if (isset(Yii::$app->redirects) && $model->url && ($model->status == $model::STATUS_PUBLISHED)) {
+        if ($url = Yii::$app->redirects->check($model->url, false)) {
+            echo Html::tag('div', Yii::t('app/modules/redirects', 'For this URL is active redirect to {url}', [
+                'url' => $url
+            ]), [
+                'class' => "alert alert-warning"
+            ]);
         }
+    }
     ?>
 
     <?= $form->field($model, 'content')->widget(Editor::class, [
@@ -79,7 +79,7 @@ use wdmg\widgets\LangSwitcher;
         'options' => [
             'id' => 'page-form-parent',
             'class' => 'form-control',
-            'disabled' => (count($parentsList) <=1 ) ? true : ((!is_null($model->source_id)) ? true : false)
+            'disabled' => (count($parentsList) <= 1 ) ? true : ((!is_null($model->source_id)) ? true : false)
         ]
     ]); ?>
 
@@ -122,15 +122,15 @@ use wdmg\widgets\LangSwitcher;
                 <?= $form->field($model, 'in_sitemap', [
                     'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
                 ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the sitemap')])->label(Yii::t('app/modules/pages', 'Sitemap'))
-                ?>
+?>
                 <?= $form->field($model, 'in_turbo', [
                     'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
                 ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the turbo-pages')])->label(Yii::t('app/modules/pages', 'Yandex turbo'))
-                ?>
+?>
                 <?= $form->field($model, 'in_amp', [
                     'template' => "{label}\n<br/>{input}\n{hint}\n{error}"
                 ])->checkbox(['label' => Yii::t('app/modules/pages', '- display in the AMP pages')])->label(Yii::t('app/modules/pages', 'Google AMP'))
-                ?>
+?>
 
                 <?= $form->field($model, 'route')->textInput([
                     'placeholder' => (is_null($model->route)) ? ((is_array($this->context->module->baseRoute)) ? array_shift($this->context->module->baseRoute) : $this->context->module->baseRoute) : false,
@@ -146,13 +146,16 @@ use wdmg\widgets\LangSwitcher;
     <hr/>
     <div class="form-group">
         <?= Html::a(Yii::t('app/modules/pages', '&larr; Back to list'), ['pages/index'], ['class' => 'btn btn-default pull-left']) ?>&nbsp;
-        <?php if ((Yii::$app->authManager && $this->context->module->moduleExist('rbac') && Yii::$app->user->can('updatePosts', [
+        <?php if (
+        (Yii::$app->authManager && $this->context->module->moduleExist('rbac') && Yii::$app->user->can('updatePosts', [
                 'created_by' => $model->created_by,
                 'updated_by' => $model->updated_by
-            ])) || !$model->id) : ?>
+            ])) || !$model->id
+) : ?>
             <?= Html::submitButton(Yii::t('app/modules/pages', 'Save'), ['class' => 'btn btn-save btn-success pull-right']) ?>
         <?php endif; ?>
     </div>
+    <?= Html::hiddenInput('source_id', $model->source_id) ?>
     <?php ActiveForm::end(); ?>
 </div>
 

@@ -13,7 +13,6 @@ use wdmg\pages\models\Pages;
  */
 class DefaultController extends Controller
 {
-
     /**
      * Default language locale
      * @var string|null
@@ -56,21 +55,18 @@ class DefaultController extends Controller
      */
     public function actionView($alias, $route = null, $lang = null, $draft = false)
     {
-
         // Check probably need redirect to new page URL
         if (isset(Yii::$app->redirects)) {
-            if (Yii::$app->redirects->check(Yii::$app->request->getUrl()))
+            if (Yii::$app->redirects->check(Yii::$app->request->getUrl())) {
                 return Yii::$app->redirects->check(Yii::$app->request->getUrl());
+            }
         }
-
-        // If the language is not transmitted, a resource with the default language may be requested
-        if (is_null($lang) && !is_null($this->_lang))
-            $lang = $this->_lang;
 
         // Separate route from request URL
         if (is_null($route) && preg_match('/^([\/]+[A-Za-z0-9_\-\_\/]+[\/])*([A-Za-z0-9_\-\_]*)/i', Yii::$app->request->url, $matches)) {
-            if ($alias == $matches[2])
+            if ($alias == $matches[2]) {
                 $route = rtrim($matches[1], '/');
+            }
         } else {
             // Normalize route
             $normalizer = new \yii\web\UrlNormalizer();
@@ -79,12 +75,20 @@ class DefaultController extends Controller
         }
 
         // If route is root
-        if (empty($route))
+        if (empty($route)) {
             $route = '/';
+        }
 
         // Search page model with alias
-        if (!($model = $this->findModel($alias, $route, $lang, $draft)))
-            throw new NotFoundHttpException();
+        $model = $this->findModel($alias, $route, $lang, $draft);
+        // If model was not found and $lang is null, search again
+        // now using the default value for the $lang parameter.
+        if (is_null($model) && is_null($lang)) {
+            $model = $this->findModel($alias, $route, $this->_lang, $draft);
+        }
+        if (is_null($model)) {
+             throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
+        }
 
         // Checking requested route with page route if set
         if (isset($model->route)) {
@@ -94,8 +98,9 @@ class DefaultController extends Controller
         }
 
         // Set a custom layout to render page
-        if (isset($model->layout))
+        if (isset($model->layout)) {
             $this->layout = $model->layout;
+        }
 
         return $this->render('index', [
             'model' => $model,
@@ -112,8 +117,7 @@ class DefaultController extends Controller
      * @param null $lang
      * @param bool $draft
      * @return Pages|null
-     * @throws NotFoundHttpException
-     */
+    */
     protected function findModel($alias, $route = null, $lang = null, $draft = false)
     {
         $locale = null;
@@ -138,31 +142,27 @@ class DefaultController extends Controller
             }
         }
 
-        // Throw an exception if a page with a language locale was requested,
-        // which is unavailable or disabled for display in the frontend
         if ((!$draft) && !is_null($lang) && is_null($locale)) {
-            throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
+            return \null;
         }
 
         if (!$draft) {
             $cond = [
                 'alias' => $alias,
                 'route' => $route,
-                'locale' => ($locale) ? $locale : null,
                 'status' => Pages::STATUS_PUBLISHED,
             ];
+            if (isset($locale)) {
+                $cond['locale'] = $locale;
+            }
         } else {
             $cond = [
-                'alias' => $alias,
-                'route' => $route,
-                'status' => Pages::STATUS_DRAFT,
+              'alias' => $alias,
+              'route' => $route,
+              'status' => Pages::STATUS_DRAFT,
             ];
         }
 
-        if (($model = Pages::findOne($cond)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
-        }
+        return Pages::findOne($cond);
     }
 }
