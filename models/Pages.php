@@ -50,16 +50,17 @@ class Pages extends ActiveRecordML
 
         $this->_module = self::getModule(true);
 
-        if (isset(Yii::$app->params["pages.baseRoute"]))
+        if (isset(Yii::$app->params["pages.baseRoute"])) {
             $this->baseRoute = Yii::$app->params["pages.baseRoute"];
-        elseif (isset($this->_module->baseRoute))
+        } elseif (isset($this->_module->baseRoute)) {
             $this->baseRoute = $this->_module->baseRoute;
+        }
 
-        if (isset(Yii::$app->params["pages.supportLocales"]))
+        if (isset(Yii::$app->params["pages.supportLocales"])) {
             $this->supportLocales = Yii::$app->params["pages.supportLocales"];
-        elseif (isset($this->_module->supportLocales))
+        } elseif (isset($this->_module->supportLocales)) {
             $this->supportLocales = $this->_module->supportLocales;
-
+        }
     }
 
     /**
@@ -80,6 +81,7 @@ class Pages extends ActiveRecordML
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['name', 'alias'], 'string', 'min' => 3, 'max' => 128],
             [['title', 'description', 'keywords'], 'string', 'max' => 255],
+            ['parent_id', 'default', 'value' => null ],
         ], parent::rules());
     }
 
@@ -119,9 +121,9 @@ class Pages extends ActiveRecordML
     {
         parent::afterFind();
 
-        if (is_null($this->url))
+        if (is_null($this->url)) {
             $this->url = $this->getUrl();
-
+        }
     }
 
     /**
@@ -159,34 +161,35 @@ class Pages extends ActiveRecordML
                 ->where(['not in', 'pages.parent_id', $subQuery])
                 ->andWhere(['!=', 'pages.id', $this->id]);
 
-            if ($this->locale)
+            if ($this->locale) {
                 $query->andWhere(['locale' => $this->locale]);
+            }
 
             $query->orWhere(['IS', 'pages.parent_id', null]);
             $query->andWhere(['locale' => $this->locale]);
 
             $pages = $query->select(['id', 'name'])->asArray()->all();
-
         } else {
             $query = self::find();
 
-            if ($this->locale)
+            if ($this->locale) {
                 $query->where(['locale' => $this->locale]);
+            }
 
             $pages = $query->select(['id', 'name'])->asArray()->all();
         }
 
-        if ($allLabel)
+        if ($allLabel) {
             return ArrayHelper::merge([
                 '*' => Yii::t('app/modules/pages', '-- All pages --')
             ], ArrayHelper::map($pages, 'id', 'name'));
-        elseif ($rootLabel)
+        } elseif ($rootLabel) {
             return ArrayHelper::merge([
-                0 => Yii::t('app/modules/pages', '-- Root page --')
+                '' => Yii::t('app/modules/pages', '-- Root page --')
             ], ArrayHelper::map($pages, 'id', 'name'));
-        else
+        } else {
             return ArrayHelper::map($pages, 'id', 'name');
-
+        }
     }
 
     /**

@@ -128,10 +128,8 @@ class PagesController extends Controller
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
             if (is_null($this->_locale)) {
-
                 $model->locale = Yii::$app->sourceLanguage;
                 if (!Yii::$app->request->isPost) {
-
                     $languages = $model->getLanguagesList(false);
                     Yii::$app->getSession()->setFlash(
                         'danger',
@@ -163,17 +161,16 @@ class PagesController extends Controller
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
-                if ($model->validate())
+                if ($model->validate()) {
                     $success = true;
-                else
+                } else {
                     $success = false;
+                }
 
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
-
             if ($model->load(Yii::$app->request->post())) {
-
                 if ($model->save()) {
                     // Log activity
                     $this->module->logActivity(
@@ -210,7 +207,6 @@ class PagesController extends Controller
             'module' => $this->module,
             'model' => $model
         ]);
-
     }
 
     /**
@@ -227,10 +223,8 @@ class PagesController extends Controller
 
         // No language is set for this model, we will use the current user language
         if (is_null($model->locale)) {
-
             $model->locale = Yii::$app->sourceLanguage;
             if (!Yii::$app->request->isPost) {
-
                 $languages = $model->getLanguagesList(false);
                 Yii::$app->getSession()->setFlash(
                     'danger',
@@ -250,22 +244,20 @@ class PagesController extends Controller
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
-                if ($model->validate())
+                if ($model->validate()) {
                     $success = true;
-                else
+                } else {
                     $success = false;
+                }
 
                 return $this->asJson(['success' => $success, 'alias' => $model->alias, 'errors' => $model->errors]);
             }
         } else {
-
             if ($model->load(Yii::$app->request->post())) {
-
                 // Get new URL for saved page
                 $newPageUrl = $model->getPageUrl(false);
 
                 if($model->save()) {
-
                     // Set 301-redirect from old URL to new
                     if (isset(Yii::$app->redirects) && ($oldPageUrl !== $newPageUrl) && ($model->status == $model::STATUS_PUBLISHED)) {
                         // @TODO: remove old redirects
@@ -351,7 +343,6 @@ class PagesController extends Controller
 
         $model = $this->findModel($id);
         if($model->delete()) {
-
             // @TODO: remove redirects of deleted pages
 
             // Log activity
@@ -411,8 +402,9 @@ class PagesController extends Controller
         if (is_null($this->_locale) && ($model = Pages::findOne($id)) !== null) {
             return $model;
         } else {
-            if (($model = Pages::findOne(['source_id' => $id, 'locale' => $this->_locale])) !== null)
+            if (($model = Pages::findOne(['source_id' => $id, 'locale' => $this->_locale])) !== null) {
                 return $model;
+            }
         }
 
         throw new NotFoundHttpException(Yii::t('app/modules/pages', 'The requested page does not exist.'));
@@ -423,7 +415,8 @@ class PagesController extends Controller
      *
      * @return string|null
      */
-    public function getLocale() {
+    public function getLocale()
+    {
         return $this->_locale;
     }
 
@@ -432,7 +425,8 @@ class PagesController extends Controller
      *
      * @return string|null
      */
-    public function getSourceId() {
+    public function getSourceId()
+    {
         return $this->_source_id;
     }
 }
